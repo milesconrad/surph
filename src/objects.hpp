@@ -209,6 +209,9 @@ class Game {
         bool GameRunning = true;
 
         void init() {
+            window.create(sf::VideoMode(900, 600), "Surph");
+            window.setVerticalSyncEnabled(true);
+
             player.init();
 
             for (int i = 0; i < WavesNum; i++) {

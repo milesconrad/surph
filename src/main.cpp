@@ -43,9 +43,6 @@ void ScoreKeeper(bool *GameOpen, double GameStart, int *score) {
 
 int main() {
     Game game;
-    game.window.create(sf::VideoMode(900, 600), "Surph");
-    game.window.setVerticalSyncEnabled(true);
-
     // PressedKeys[0] is left arrow, PressedKeys[1] is right arrow
     bool PressedKeys[2] = {false, false};
     double LastFrame = GetTime();
