@@ -2,6 +2,7 @@
 #include <thread>
 #include "objects.hpp"
 
+// saves a lot of space in the GetTime() function
 using namespace std::chrono;
 
 double GetTime() {

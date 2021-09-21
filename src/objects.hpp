@@ -5,7 +5,7 @@
 std::random_device RandomDevice;
 std::mt19937 rng(RandomDevice());
 // generation range makes sure boulders/waves are not directly at the edge
-std::uniform_int_distribution<int> PosGen(50, 850);
+std::uniform_int_distribution<int> PositionGen(50, 850);
 std::uniform_int_distribution<int> BoulderSpriteGen(1, 3);
 
 class Wave {
@@ -24,7 +24,7 @@ class Wave {
             entity.setTexture(&texture);
             entity.setSize(sf::Vector2f(400, height));
             entity.setOrigin(100, height / 2);
-            entity.setPosition(PosGen(rng), -height / 2);
+            entity.setPosition(PositionGen(rng), -height / 2);
         }
 
         void update(float dt, int score) {
@@ -49,7 +49,7 @@ class Boulder {
 
             entity.setRadius(height / 2);
             entity.setOrigin(height / 2, height / 2);
-            entity.setPosition(PosGen(rng), -height / 2);
+            entity.setPosition(PositionGen(rng), -height / 2);
         }
 
         void update(float dt, int score) {
@@ -114,8 +114,10 @@ class Player {
             EdgePoints[5] = sf::Vector2f(-(bounds.width / 5), -(bounds.height / 2.5));
             EdgePoints[6] = sf::Vector2f(bounds.width / 5, -(bounds.height / 2.5));
 
-            // score increases all velocities
+            
             GlobalPosition = entity.getPosition();
+            // if the left or right key is pressed, accelerate and tilt in that direction
+            // score makes everything move faster
             if (PressedKeys[0]) {
                 entity.setRotation(-20);
 
@@ -225,6 +227,7 @@ class Game {
             for (int i = 0; i < BouldersNum; i++) {
                 BoulderPos = boulders[i].entity.getPosition();
                 for (int j = 0; j < player.EdgePointsNum; j++) {
+                    // finds distance between current edge point and the center of the boulder
                     distance = sqrt(pow(BoulderPos.x - EdgePoints[j].x, 2) + pow(BoulderPos.y - EdgePoints[j].y, 2));
                     if (distance <= boulders[i].entity.getRadius()) {
                         return true;
