@@ -61,21 +61,11 @@ int main() {
         DeltaTime = (GetTime() - LastFrame) / 1000;
         LastFrame = GetTime();
 
-        game.run(DeltaTime, PressedKeys, score);
-        
-        sf::Vector2f BoulderPos;
-        sf::Vector2f *EdgePoints = game.player.GlobalEdgePoints;
-        int distance;
-        for (int i = 0; i < game.BouldersNum; i++) {
-            BoulderPos = game.boulders[i].entity.getPosition();
-            for (int j = 0; j < game.player.EdgePointsNum; j++) {
-                distance = sqrt(pow(BoulderPos.x - EdgePoints[j].x, 2) + pow(BoulderPos.y - EdgePoints[j].y, 2));
-                if (distance <= game.boulders[i].entity.getRadius()) {
-                    game.end(score);
-                }
-            }
+        if (game.CollisionDetect()) {
+            game.end(score);
         }
 
+        game.run(DeltaTime, PressedKeys, score);
         game.window.display();
     }
 

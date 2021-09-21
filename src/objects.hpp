@@ -59,7 +59,6 @@ class Boulder {
 
 class Player {
     private:
-    sf::Vector2f LocalEdgePoints[7];
         sf::Vector2f GlobalPosition;
         float radians;
         sf::Texture texture;
@@ -71,8 +70,8 @@ class Player {
 
         sf::FloatRect bounds;
         
-        sf::Vector2f GlobalEdgePoints[7];
-        int EdgePointsNum = sizeof(GlobalEdgePoints) / sizeof(GlobalEdgePoints[0]);
+        sf::Vector2f EdgePoints[7];
+        int EdgePointsNum = sizeof(EdgePoints) / sizeof(EdgePoints[0]);
 
         void init() {
             if (!texture.loadFromFile("assets/surfer.png")) {
@@ -92,32 +91,36 @@ class Player {
             bounds.height = bounds.height * entity.getScale().y;
         }
 
+        void RotatePoints(float factor) {
+            for (int i = 0; i < EdgePointsNum; i++) {
+                EdgePoints[i].x = -EdgePoints[i].y * sin(factor) + EdgePoints[i].x * cos(factor);
+                EdgePoints[i].y = EdgePoints[i].y * cos(factor) + EdgePoints[i].x * sin(factor);
+
+                EdgePoints[i].x = GlobalPosition.x + EdgePoints[i].x;
+                EdgePoints[i].y = GlobalPosition.y + EdgePoints[i].y;
+            }
+        }
+
         void UpdateData(bool PressedKeys[], int score) {
             // defining the outline of the ellipse relative to the center
-            // Only drawing points near the front of the surfboard, because touching the rock from the back would not kill you
-            LocalEdgePoints[0] = sf::Vector2f(-(bounds.width / 2), 0);
-            LocalEdgePoints[1] = sf::Vector2f(0, -(bounds.height / 2));
-            LocalEdgePoints[2] = sf::Vector2f(bounds.width / 2, 0);
+            // only drawing points near the front of the surfboard, because touching the rock from the back would not kill you
+            EdgePoints[0] = sf::Vector2f(-(bounds.width / 2), 0);
+            EdgePoints[1] = sf::Vector2f(0, -(bounds.height / 2));
+            EdgePoints[2] = sf::Vector2f(bounds.width / 2, 0);
 
-            LocalEdgePoints[3] = sf::Vector2f(-(bounds.width / 3), -(bounds.height / 4));
-            LocalEdgePoints[4] = sf::Vector2f(bounds.width / 3, -(bounds.height / 4));
+            EdgePoints[3] = sf::Vector2f(-(bounds.width / 3), -(bounds.height / 4));
+            EdgePoints[4] = sf::Vector2f(bounds.width / 3, -(bounds.height / 4));
 
-            LocalEdgePoints[5] = sf::Vector2f(-(bounds.width / 5), -(bounds.height / 2.5));
-            LocalEdgePoints[6] = sf::Vector2f(bounds.width / 5, -(bounds.height / 2.5));
+            EdgePoints[5] = sf::Vector2f(-(bounds.width / 5), -(bounds.height / 2.5));
+            EdgePoints[6] = sf::Vector2f(bounds.width / 5, -(bounds.height / 2.5));
 
             // score increases all velocities
             GlobalPosition = entity.getPosition();
             if (PressedKeys[0]) {
                 entity.setRotation(-20);
 
-                for (int i = 0; i < EdgePointsNum; i++) {
-                    radians = -20 * 3.1415926 / 180;
-                    GlobalEdgePoints[i].x = -LocalEdgePoints[i].y * sin(radians) + LocalEdgePoints[i].x * cos(radians);
-                    GlobalEdgePoints[i].y = LocalEdgePoints[i].y * cos(radians) + LocalEdgePoints[i].x * sin(radians);
-
-                    GlobalEdgePoints[i].x = GlobalPosition.x + GlobalEdgePoints[i].x;
-                    GlobalEdgePoints[i].y = GlobalPosition.y + GlobalEdgePoints[i].y;
-                }
+                radians = -20 * 3.1415926 / 180;
+                RotatePoints(radians);
 
                 if (velocity > (-200 - (score * 2))) {
                     velocity -= 5 + (score * 2);
@@ -126,14 +129,8 @@ class Player {
             else if (PressedKeys[1]) {
                 entity.setRotation(20);
 
-                for (int i = 0; i < EdgePointsNum; i++) {
-                    radians = 20 * 3.1415926 / 180;
-                    GlobalEdgePoints[i].x = -LocalEdgePoints[i].y * sin(radians) + LocalEdgePoints[i].x * cos(radians);
-                    GlobalEdgePoints[i].y = LocalEdgePoints[i].y * cos(radians) + LocalEdgePoints[i].x * sin(radians);
-
-                    GlobalEdgePoints[i].x = GlobalPosition.x + GlobalEdgePoints[i].x;
-                    GlobalEdgePoints[i].y = GlobalPosition.y + GlobalEdgePoints[i].y;
-                }
+                radians = 20 * 3.1415926 / 180;
+                RotatePoints(radians);
 
                 if (velocity < (200 + (score * 2))) {
                     velocity += 5 + (score * 2);
@@ -147,33 +144,22 @@ class Player {
                     velocity -= 1.5;
                 }
 
+                // rotates points and player back to 0
                 if (entity.getRotation() != 0) {
                     if (entity.getRotation() < 0) {
-                        for (int i = 0; i < EdgePointsNum; i++) {
-                            radians = 20 * 3.1415926 / 180;
-                            GlobalEdgePoints[i].x = -LocalEdgePoints[i].y * sin(radians) + LocalEdgePoints[i].x * cos(radians);
-                            GlobalEdgePoints[i].y = LocalEdgePoints[i].y * cos(radians) + LocalEdgePoints[i].x * sin(radians);
-
-                            GlobalEdgePoints[i].x = GlobalPosition.x + GlobalEdgePoints[i].x;
-                            GlobalEdgePoints[i].y = GlobalPosition.y + GlobalEdgePoints[i].y;
-                        }
+                        radians = 20 * 3.1415926 / 180;
+                        RotatePoints(radians);
                     }
                     else if (entity.getRotation() > 0) {
-                        for (int i = 0; i < EdgePointsNum; i++) {
-                            radians = -20 * 3.1415926 / 180;
-                            GlobalEdgePoints[i].x = -LocalEdgePoints[i].y * sin(radians) + LocalEdgePoints[i].x * cos(radians);
-                            GlobalEdgePoints[i]. y = LocalEdgePoints[i].y * cos(radians) + LocalEdgePoints[i].x * sin(radians);
-
-                            GlobalEdgePoints[i].x = GlobalPosition.x + GlobalEdgePoints[i].x;
-                            GlobalEdgePoints[i].y = GlobalPosition.y + GlobalEdgePoints[i].y;
-                        }
+                        radians = -20 * 3.1415926 / 180;
+                        RotatePoints(radians);
                     }
                     entity.setRotation(0);
                 }
                 else {
                     for (int i = 0; i < EdgePointsNum; i++) {
-                        GlobalEdgePoints[i].x = GlobalPosition.x + LocalEdgePoints[i].x;
-                        GlobalEdgePoints[i].y = GlobalPosition.y + LocalEdgePoints[i].y;
+                        EdgePoints[i].x = GlobalPosition.x + EdgePoints[i].x;
+                        EdgePoints[i].y = GlobalPosition.y + EdgePoints[i].y;
                     }
                 }
             }
@@ -230,6 +216,22 @@ class Game {
 
             ScoreText.setFont(arial);
             ScoreText.setCharacterSize(30);
+        }
+
+        bool CollisionDetect() {
+            sf::Vector2f BoulderPos;
+            sf::Vector2f *EdgePoints = player.EdgePoints;
+            int distance;
+            for (int i = 0; i < BouldersNum; i++) {
+                BoulderPos = boulders[i].entity.getPosition();
+                for (int j = 0; j < player.EdgePointsNum; j++) {
+                    distance = sqrt(pow(BoulderPos.x - EdgePoints[j].x, 2) + pow(BoulderPos.y - EdgePoints[j].y, 2));
+                    if (distance <= boulders[i].entity.getRadius()) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         void run(float dt, bool *keys, int score) {
