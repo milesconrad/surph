@@ -60,9 +60,9 @@ class Boulder {
 class Player {
     private:
         sf::Vector2f GlobalPosition;
-        float radians;
         sf::Texture texture;
-        float velocity = 0;
+        float velocity;
+        float radians;
 
     public:
         sf::CircleShape entity;
@@ -74,6 +74,8 @@ class Player {
         int EdgePointsNum = sizeof(EdgePoints) / sizeof(EdgePoints[0]);
 
         void init() {
+            // makes a fresh circle shape (for restarting game)
+            entity = sf::CircleShape();
             if (!texture.loadFromFile("assets/surfer.png")) {
                 texture.loadFromFile("assets/surfer.png");
             }
@@ -89,6 +91,8 @@ class Player {
             bounds = entity.getLocalBounds();
             // bounds still think the ellipse is a circle
             bounds.height = bounds.height * entity.getScale().y;
+
+            velocity = 0;
         }
 
         void RotatePoints(float factor) {
@@ -101,7 +105,7 @@ class Player {
             }
         }
 
-        void UpdateData(bool PressedKeys[], int score) {
+        void UpdateData(bool (*PressedKeys)[2], int score) {
             // defining the outline of the ellipse relative to the center
             // only drawing points near the front of the surfboard, because touching the rock from the back would not kill you
             EdgePoints[0] = sf::Vector2f(-(bounds.width / 2), 0);
@@ -118,7 +122,7 @@ class Player {
             GlobalPosition = entity.getPosition();
             // if the left or right key is pressed, accelerate and tilt in that direction
             // score makes everything move faster
-            if (PressedKeys[0]) {
+            if ((*PressedKeys)[0]) {
                 entity.setRotation(-20);
 
                 radians = -20 * 3.1415926 / 180;
@@ -128,7 +132,7 @@ class Player {
                     velocity -= 5 + (score * 2);
                 }
             }
-            else if (PressedKeys[1]) {
+            else if ((*PressedKeys)[1]) {
                 entity.setRotation(20);
 
                 radians = 20 * 3.1415926 / 180;
@@ -184,9 +188,11 @@ class Game {
     private:
         sf::Font arial;
         sf::Text ScoreText;
+        sf::Text RestartText;
 
     public:
         sf::RenderWindow window;
+        int score;
         Player player;
 
         Boulder boulders[4];
@@ -195,10 +201,13 @@ class Game {
         int WavesNum = sizeof(waves) / sizeof(waves[0]);
 
         bool GameRunning = true;
+        double StartTime;
 
-        void init() {
+        void init(double CurrentTime) {
             window.create(sf::VideoMode(900, 600), "Surph");
             window.setVerticalSyncEnabled(true);
+            StartTime = CurrentTime;
+            score = 0;
 
             player.init();
 
@@ -218,6 +227,16 @@ class Game {
 
             ScoreText.setFont(arial);
             ScoreText.setCharacterSize(30);
+            ScoreText.setOutlineColor(sf::Color::Black);
+            ScoreText.setOutlineThickness(0);
+            
+            RestartText.setFont(arial);
+            RestartText.setCharacterSize(30);
+            RestartText.setString("Press Space to Restart");
+            sf::FloatRect RestartBounds = RestartText.getLocalBounds();
+            RestartText.setPosition(450 - RestartBounds.width / 2, 300 - RestartBounds.height / 2 + 60);
+            RestartText.setOutlineColor(sf::Color::Black);
+            RestartText.setOutlineThickness(5);
         }
 
         bool CollisionDetect() {
@@ -237,7 +256,7 @@ class Game {
             return false;
         }
 
-        void run(float dt, bool *keys, int score) {
+        void run(float dt, bool (*keys)[2]) {
             if (GameRunning) {
                 window.clear(sf::Color(20, 37, 107, 255));
 
@@ -263,8 +282,8 @@ class Game {
 
                 // use the height of the text box to determine padding
                 ScoreText.setString("Score: " + std::to_string(score));
-                sf::FloatRect bounds = ScoreText.getLocalBounds();
-                ScoreText.setPosition(900 - bounds.width - bounds.height, bounds.height);
+                sf::FloatRect ScoreBounds = ScoreText.getLocalBounds();
+                ScoreText.setPosition(900 - ScoreBounds.width - ScoreBounds.height, ScoreBounds.height);
                 window.draw(ScoreText);
             }
             else {
@@ -279,19 +298,39 @@ class Game {
                 window.draw(player.entity);
                 
                 window.draw(ScoreText);
+                window.draw(RestartText);
             }
         }
 
-        void end(int score) {
+        void end() {
             GameRunning = false;
             ScoreText.setString("Game Over! Total Score: " + std::to_string(score));
 
-            ScoreText.setCharacterSize(40);
-            ScoreText.setFillColor(sf::Color::White);
-            ScoreText.setOutlineThickness(3);
-            ScoreText.setOutlineColor(sf::Color::Black);
+            ScoreText.setCharacterSize(30);
+            ScoreText.setOutlineThickness(5);
             
-            sf::FloatRect bounds = ScoreText.getLocalBounds();
-            ScoreText.setPosition(450 - bounds.width / 2, 300 - bounds.height / 2);
+            sf::FloatRect ScoreBounds = ScoreText.getLocalBounds();
+            ScoreText.setPosition(450 - ScoreBounds.width / 2, 300 - ScoreBounds.height / 2 - 60);
+        }
+
+        void restart(double CurrentTime, bool (*PressedKeys)[2]) {
+            (*PressedKeys)[0] = false;
+            (*PressedKeys)[1] = false;
+            GameRunning = true;
+            StartTime = CurrentTime;
+            score = 0;
+        
+            for (int i = 0; i < WavesNum; i++) {
+                waves[i].init();
+                waves[i].entity.move(0, -125 * i);
+            }
+            for (int i = 0; i < BouldersNum; i++) {
+                boulders[i].init();
+                boulders[i].entity.move(0, -175 * i);
+            }
+            player.init();
+
+            ScoreText.setCharacterSize(30);
+            ScoreText.setOutlineThickness(0);
         }
 };
