@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include <random>
-#include <iostream>
 
 std::random_device RandomDevice;
 std::mt19937 rng(RandomDevice());
