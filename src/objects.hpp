@@ -256,9 +256,8 @@ class Game {
         }
 
         void run(float dt, bool (*keys)[2]) {
+            window.clear(sf::Color(20, 37, 107, 255));
             if (GameRunning) {
-                window.clear(sf::Color(20, 37, 107, 255));
-
                 for (int i = 0; i < WavesNum; i++) {
                     if (waves[i].entity.getPosition().y > 600 + waves[i].height) {
                         waves[i].init();
@@ -286,8 +285,6 @@ class Game {
                 window.draw(ScoreText);
             }
             else {
-                window.clear(sf::Color(20, 37, 107, 255));
-
                 for (int i = 0; i < WavesNum; i++) {
                     window.draw(waves[i].entity);
                 }
