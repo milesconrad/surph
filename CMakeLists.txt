@@ -3,7 +3,7 @@
 #########
 
 # cmake_minimum_required(VERSION 3.20)
-# project(tetris)
+# project(surph)
 
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY src/)
 
@@ -19,7 +19,7 @@
 
 # cmake -G "MinGW Makefiles"
 # cmake_minimum_required(VERSION 3.20)
-# project(tetris)
+# project(surph)
 
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "src/")
 
