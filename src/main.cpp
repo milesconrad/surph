@@ -1,6 +1,6 @@
 #include <chrono>
 #include <thread>
-#include "objects.hpp"
+#include "game.hpp"
 
 // saves a lot of space in the GetTime() function
 using namespace std::chrono;
