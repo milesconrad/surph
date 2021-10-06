@@ -17,7 +17,7 @@
 # Windows #
 ###########
 
-# cmake -G "MinGW Makefiles"
+# cmake -G "MinGW Makefiles" .\
 # cmake_minimum_required(VERSION 3.20)
 # project(surph)
 
