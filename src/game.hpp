@@ -1,13 +1,14 @@
 #include <random>
-#include "player.hpp"
-#include "boulder.hpp"
-#include "wave.hpp"
 
 std::random_device RandomDevice;
 std::mt19937 rng(RandomDevice());
 // generation range makes sure boulders/waves are not directly at the edge
 std::uniform_int_distribution<int> PositionGen(50, 850);
 std::uniform_int_distribution<int> BoulderSpriteGen(1, 3);
+
+#include "player.hpp"
+#include "boulder.hpp"
+#include "wave.hpp"
 
 class Game {
     private:
