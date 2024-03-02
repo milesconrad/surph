@@ -2,7 +2,7 @@
 
 class Player {
     private:
-        sf::Vector2f GlobalPosition;
+        sf::Vector2f globalPosition;
         sf::Texture texture;
         float velocity;
         float radians;
@@ -13,8 +13,8 @@ class Player {
 
         sf::FloatRect bounds;
         
-        sf::Vector2f EdgePoints[7];
-        int EdgePointsNum = sizeof(EdgePoints) / sizeof(EdgePoints[0]);
+        sf::Vector2f edgePoints[7];
+        int edgePointsNum = sizeof(edgePoints) / sizeof(edgePoints[0]);
 
         void init() {
             // makes a fresh circle shape (for restarting game)
@@ -25,7 +25,7 @@ class Player {
             entity.setTexture(&texture);
 
             entity.setRadius(height);
-            // makes the circle a 31, ~100 ellipse
+            // makes the circle a 31 x ~100 ellipse
             entity.scale(1, 3.2);
 
             entity.setOrigin(height, height);
@@ -38,48 +38,48 @@ class Player {
             velocity = 0;
         }
 
-        void RotatePoints(float factor) {
-            for (int i = 0; i < EdgePointsNum; i++) {
-                EdgePoints[i].x = -EdgePoints[i].y * sin(factor) + EdgePoints[i].x * cos(factor);
-                EdgePoints[i].y = EdgePoints[i].y * cos(factor) + EdgePoints[i].x * sin(factor);
+        void rotatePoints(float factor) {
+            for (int i = 0; i < edgePointsNum; i++) {
+                edgePoints[i].x = -edgePoints[i].y * sin(factor) + edgePoints[i].x * cos(factor);
+                edgePoints[i].y = edgePoints[i].y * cos(factor) + edgePoints[i].x * sin(factor);
 
-                EdgePoints[i].x = GlobalPosition.x + EdgePoints[i].x;
-                EdgePoints[i].y = GlobalPosition.y + EdgePoints[i].y;
+                edgePoints[i].x = globalPosition.x + edgePoints[i].x;
+                edgePoints[i].y = globalPosition.y + edgePoints[i].y;
             }
         }
 
-        void UpdateData(bool (*PressedKeys)[2], int score) {
+        void updateData(int *direction, int score) {
             // defining the outline of the ellipse relative to the center
             // only drawing points near the front of the surfboard, because touching the rock from the back would not kill you
-            EdgePoints[0] = sf::Vector2f(-(bounds.width / 2), 0);
-            EdgePoints[1] = sf::Vector2f(0, -(bounds.height / 2));
-            EdgePoints[2] = sf::Vector2f(bounds.width / 2, 0);
+            edgePoints[0] = sf::Vector2f(-(bounds.width / 2), 0);
+            edgePoints[1] = sf::Vector2f(0, -(bounds.height / 2));
+            edgePoints[2] = sf::Vector2f(bounds.width / 2, 0);
 
-            EdgePoints[3] = sf::Vector2f(-(bounds.width / 3), -(bounds.height / 4));
-            EdgePoints[4] = sf::Vector2f(bounds.width / 3, -(bounds.height / 4));
+            edgePoints[3] = sf::Vector2f(-(bounds.width / 3), -(bounds.height / 4));
+            edgePoints[4] = sf::Vector2f(bounds.width / 3, -(bounds.height / 4));
 
-            EdgePoints[5] = sf::Vector2f(-(bounds.width / 5), -(bounds.height / 2.5));
-            EdgePoints[6] = sf::Vector2f(bounds.width / 5, -(bounds.height / 2.5));
+            edgePoints[5] = sf::Vector2f(-(bounds.width / 5), -(bounds.height / 2.5));
+            edgePoints[6] = sf::Vector2f(bounds.width / 5, -(bounds.height / 2.5));
 
             
-            GlobalPosition = entity.getPosition();
+            globalPosition = entity.getPosition();
             // if the left or right key is pressed, accelerate and tilt in that direction
             // score makes everything move faster
-            if ((*PressedKeys)[0]) {
+            if ((*direction) < 0) {
                 entity.setRotation(-20);
 
                 radians = -20 * 3.1415926 / 180;
-                RotatePoints(radians);
+                rotatePoints(radians);
 
                 if (velocity > (-200 - (score * 2))) {
                     velocity -= 5 + (score * 2);
                 }
             }
-            else if ((*PressedKeys)[1]) {
+            else if ((*direction) > 0) {
                 entity.setRotation(20);
 
                 radians = 20 * 3.1415926 / 180;
-                RotatePoints(radians);
+                rotatePoints(radians);
 
                 if (velocity < (200 + (score * 2))) {
                     velocity += 5 + (score * 2);
@@ -97,24 +97,24 @@ class Player {
                 if (entity.getRotation() != 0) {
                     if (entity.getRotation() < 0) {
                         radians = 20 * 3.1415926 / 180;
-                        RotatePoints(radians);
+                        rotatePoints(radians);
                     }
                     else if (entity.getRotation() > 0) {
                         radians = -20 * 3.1415926 / 180;
-                        RotatePoints(radians);
+                        rotatePoints(radians);
                     }
                     entity.setRotation(0);
                 }
                 else {
-                    for (int i = 0; i < EdgePointsNum; i++) {
-                        EdgePoints[i].x = GlobalPosition.x + EdgePoints[i].x;
-                        EdgePoints[i].y = GlobalPosition.y + EdgePoints[i].y;
+                    for (int i = 0; i < edgePointsNum; i++) {
+                        edgePoints[i].x = globalPosition.x + edgePoints[i].x;
+                        edgePoints[i].y = globalPosition.y + edgePoints[i].y;
                     }
                 }
             }
         }
 
-        void UpdatePos(float dt) {
+        void updatePos(float dt) {
             if (entity.getPosition().x > 80 && velocity < 0) {
                 entity.move(velocity * dt, 0);
             }

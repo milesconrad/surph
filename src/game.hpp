@@ -1,10 +1,10 @@
 #include <random>
 
-std::random_device RandomDevice;
-std::mt19937 rng(RandomDevice());
+std::random_device randomDevice;
+std::mt19937 rng(randomDevice());
 // generation range makes sure boulders/waves are not directly at the edge
-std::uniform_int_distribution<int> PositionGen(50, 850);
-std::uniform_int_distribution<int> BoulderSpriteGen(1, 3);
+std::uniform_int_distribution<int> positionGen(50, 850);
+std::uniform_int_distribution<int> boulderSpriteGen(1, 3);
 
 #include "player.hpp"
 #include "boulder.hpp"
@@ -13,8 +13,7 @@ std::uniform_int_distribution<int> BoulderSpriteGen(1, 3);
 class Game {
     private:
         sf::Font arial;
-        sf::Text ScoreText;
-        sf::Text RestartText;
+        sf::Text scoreText;
 
     public:
         sf::RenderWindow window;
@@ -22,27 +21,28 @@ class Game {
         Player player;
 
         Boulder boulders[4];
-        int BouldersNum = sizeof(boulders) / sizeof(boulders[0]);
+        int bouldersNum = sizeof(boulders) / sizeof(boulders[0]);
         Wave waves[5];
-        int WavesNum = sizeof(waves) / sizeof(waves[0]);
+        int wavesNum = sizeof(waves) / sizeof(waves[0]);
 
-        bool GameRunning = true;
-        double StartTime;
+        bool gameRunning = true;
+        double startTime;
 
-        void init(double CurrentTime) {
+        void init(double currentTime) {
             window.create(sf::VideoMode(900, 600), "Surph");
             window.setVerticalSyncEnabled(true);
-            StartTime = CurrentTime;
+            window.setKeyRepeatEnabled(false);
+            startTime = currentTime;
             score = 0;
 
             player.init();
 
-            for (int i = 0; i < WavesNum; i++) {
+            for (int i = 0; i < wavesNum; i++) {
                 waves[i].init();
                 waves[i].entity.move(0, -125 * i);
             }
 
-            for (int i = 0; i < BouldersNum; i++) {
+            for (int i = 0; i < bouldersNum; i++) {
                 boulders[i].init();
                 boulders[i].entity.move(0, -175 * i);
             }
@@ -51,29 +51,21 @@ class Game {
                 window.close();
             }
 
-            ScoreText.setFont(arial);
-            ScoreText.setCharacterSize(30);
-            ScoreText.setOutlineColor(sf::Color::Black);
-            ScoreText.setOutlineThickness(0);
-            
-            RestartText.setFont(arial);
-            RestartText.setCharacterSize(30);
-            RestartText.setString("Press Space to Restart");
-            sf::FloatRect RestartBounds = RestartText.getLocalBounds();
-            RestartText.setPosition(450 - RestartBounds.width / 2, 300 - RestartBounds.height / 2 + 60);
-            RestartText.setOutlineColor(sf::Color::Black);
-            RestartText.setOutlineThickness(5);
+            scoreText.setFont(arial);
+            scoreText.setCharacterSize(30);
+            scoreText.setOutlineColor(sf::Color::Black);
+            scoreText.setOutlineThickness(0);
         }
 
-        bool CollisionDetect() {
-            sf::Vector2f BoulderPos;
-            sf::Vector2f *EdgePoints = player.EdgePoints;
+        bool collisionDetect() {
+            sf::Vector2f boulderPos;
+            sf::Vector2f *edgePoints = player.edgePoints;
             int distance;
-            for (int i = 0; i < BouldersNum; i++) {
-                BoulderPos = boulders[i].entity.getPosition();
-                for (int j = 0; j < player.EdgePointsNum; j++) {
+            for (int i = 0; i < bouldersNum; i++) {
+                boulderPos = boulders[i].entity.getPosition();
+                for (int j = 0; j < player.edgePointsNum; j++) {
                     // finds distance between current edge point and the center of the boulder
-                    distance = sqrt(pow(BoulderPos.x - EdgePoints[j].x, 2) + pow(BoulderPos.y - EdgePoints[j].y, 2));
+                    distance = sqrt(pow(boulderPos.x - edgePoints[j].x, 2) + pow(boulderPos.y - edgePoints[j].y, 2));
                     if (distance <= boulders[i].entity.getRadius()) {
                         return true;
                     }
@@ -82,10 +74,10 @@ class Game {
             return false;
         }
 
-        void run(float dt, bool (*keys)[2]) {
+        void run(float dt, int *direction) {
             window.clear(sf::Color(20, 37, 107, 255));
-            if (GameRunning) {
-                for (int i = 0; i < WavesNum; i++) {
+            if (gameRunning) {
+                for (int i = 0; i < wavesNum; i++) {
                     if (waves[i].entity.getPosition().y > 600 + waves[i].height) {
                         waves[i].init();
                     }
@@ -93,7 +85,7 @@ class Game {
                     window.draw(waves[i].entity);
                 }
 
-                for (int i = 0; i < BouldersNum; i++) {
+                for (int i = 0; i < bouldersNum; i++) {
                     if (boulders[i].entity.getPosition().y > 600 + boulders[i].height) {
                         boulders[i].init();
                     }
@@ -101,59 +93,58 @@ class Game {
                     window.draw(boulders[i].entity);
                 }
 
-                player.UpdateData(keys, score);
-                player.UpdatePos(dt);
+                player.updateData(direction, score);
+                player.updatePos(dt);
                 window.draw(player.entity);
 
+                // position needs to be redefined because text size changes as game progresses
                 // use the height of the text box to determine padding
-                ScoreText.setString("Score: " + std::to_string(score));
-                sf::FloatRect ScoreBounds = ScoreText.getLocalBounds();
-                ScoreText.setPosition(900 - ScoreBounds.width - ScoreBounds.height, ScoreBounds.height);
-                window.draw(ScoreText);
+                scoreText.setString("Score: " + std::to_string(score));
+                sf::FloatRect scoreBounds = scoreText.getLocalBounds();
+                scoreText.setPosition(900 - scoreBounds.width - scoreBounds.height + scoreBounds.left, scoreBounds.height - scoreBounds.top);
+                window.draw(scoreText);
             }
             else {
-                for (int i = 0; i < WavesNum; i++) {
+                for (int i = 0; i < wavesNum; i++) {
                     window.draw(waves[i].entity);
                 }
-                for (int i = 0; i < BouldersNum; i++) {
+                for (int i = 0; i < bouldersNum; i++) {
                     window.draw(boulders[i].entity);
                 }
                 window.draw(player.entity);
                 
-                window.draw(ScoreText);
-                window.draw(RestartText);
+                window.draw(scoreText);
             }
         }
 
         void end() {
-            GameRunning = false;
-            ScoreText.setString("Game Over! Total Score: " + std::to_string(score));
+            gameRunning = false;
+            // i know this is bad practice but i didn't feel like making a second object just for an end screen
+            scoreText.setString("Game Over! Total Score: " + std::to_string(score) + "\n\n   Press Space to Restart!");
 
-            ScoreText.setCharacterSize(30);
-            ScoreText.setOutlineThickness(5);
+            scoreText.setCharacterSize(30);
+            scoreText.setOutlineThickness(5);
             
-            sf::FloatRect ScoreBounds = ScoreText.getLocalBounds();
-            ScoreText.setPosition(450 - ScoreBounds.width / 2, 300 - ScoreBounds.height / 2 - 60);
+            sf::FloatRect scoreBounds = scoreText.getLocalBounds();
+            scoreText.setPosition(450 - scoreBounds.width / 2, 300 - scoreBounds.height / 2);
         }
 
-        void restart(double CurrentTime, bool (*PressedKeys)[2]) {
-            (*PressedKeys)[0] = false;
-            (*PressedKeys)[1] = false;
-            GameRunning = true;
-            StartTime = CurrentTime;
+        void restart(double currentTime) {
+            gameRunning = true;
+            startTime = currentTime;
             score = 0;
         
-            for (int i = 0; i < WavesNum; i++) {
+            for (int i = 0; i < wavesNum; i++) {
                 waves[i].init();
                 waves[i].entity.move(0, -125 * i);
             }
-            for (int i = 0; i < BouldersNum; i++) {
+            for (int i = 0; i < bouldersNum; i++) {
                 boulders[i].init();
                 boulders[i].entity.move(0, -175 * i);
             }
             player.init();
 
-            ScoreText.setCharacterSize(30);
-            ScoreText.setOutlineThickness(0);
+            scoreText.setCharacterSize(30);
+            scoreText.setOutlineThickness(0);
         }
 };

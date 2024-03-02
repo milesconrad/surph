@@ -8,14 +8,14 @@ class Boulder {
         int height = 150;
 
         void init() {
-            if (!texture.loadFromFile("assets/boulder_" + std::to_string(BoulderSpriteGen(rng)) + ".png")) {
-                texture.loadFromFile("assets/boulder_" + std::to_string(BoulderSpriteGen(rng)) + ".png");
+            if (!texture.loadFromFile("assets/boulder_" + std::to_string(boulderSpriteGen(rng)) + ".png")) {
+                texture.loadFromFile("assets/boulder_" + std::to_string(boulderSpriteGen(rng)) + ".png");
             }
             entity.setTexture(&texture);
 
             entity.setRadius(height / 2);
             entity.setOrigin(height / 2, height / 2);
-            entity.setPosition(PositionGen(rng), -height / 2);
+            entity.setPosition(positionGen(rng), -height / 2);
         }
 
         void update(float dt, int score) {

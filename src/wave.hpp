@@ -14,7 +14,7 @@ class Wave {
             entity.setTexture(&texture);
             entity.setSize(sf::Vector2f(400, height));
             entity.setOrigin(100, height / 2);
-            entity.setPosition(PositionGen(rng), -height / 2);
+            entity.setPosition(positionGen(rng), -height / 2);
         }
 
         void update(float dt, int score) {
