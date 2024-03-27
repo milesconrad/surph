@@ -1,34 +1,34 @@
-#include <chrono>
 #include <thread>
 #include "game.hpp"
 
-double getTime();
-void handleEvent(sf::Event event, Game *game, int *direction);
-void scoreKeeper(Game *game);
+void handleEvent(sf::Event event);
+void scoreKeeper();
+
+Game game;
+sf::Clock gameClock;
+// -1 is left, 1 is right
+int playerDirection = 0;
 
 int main() {
-    Game game;
-    game.init(getTime());
-    std::thread scoreKeeperThread(scoreKeeper, &game);
+    game.init();
+    std::thread scoreKeeperThread(scoreKeeper);
 
-    // -1 is left, 1 is right
-    int playerDirection = 0;
-    double LastFrame = game.startTime;
-    float DeltaTime;
+    float lastFrame = gameClock.getElapsedTime().asSeconds();
+    float deltaTime;
     while (game.window.isOpen()) {
         sf::Event event;
         if (game.window.pollEvent(event)) {
-            handleEvent(event, &game, &playerDirection);
+            handleEvent(event);
         }
 
-        DeltaTime = (getTime() - LastFrame) / 1000;
-        LastFrame = getTime();
+        deltaTime = gameClock.getElapsedTime().asSeconds() - lastFrame;
+        lastFrame = gameClock.getElapsedTime().asSeconds();
 
         if (game.collisionDetect()) {
             game.end();
         }
 
-        game.run(DeltaTime, &playerDirection);
+        game.run(deltaTime, &playerDirection);
         game.window.display();
     }
 
@@ -36,44 +36,40 @@ int main() {
     return 0;
 }
 
-void scoreKeeper(Game *game) {
-    while ((*game).window.isOpen()) {
-        if ((*game).gameRunning) {
-            (*game).score = (getTime() - (*game).startTime) / 1000;
+void scoreKeeper() {
+    while (game.window.isOpen()) {
+        if (game.gameRunning) {
+            game.score = gameClock.getElapsedTime().asSeconds();
         }
     } 
 }
 
-void handleEvent(sf::Event event, Game *game, int *direction) {
+void handleEvent(sf::Event event) {
     if (event.type == sf::Event::Closed) {
-        (*game).gameRunning = false;
-        (*game).window.close();
+        game.gameRunning = false;
+        game.window.close();
     }
 
-    if ((*game).gameRunning) {
+    if (game.gameRunning) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Key::Left) {
-                (*direction) -= 1;
+                playerDirection -= 1;
             }
             if (event.key.code == sf::Keyboard::Key::Right) {
-                (*direction) += 1;
+                playerDirection += 1;
             }
         }
         else if (event.type == sf::Event::KeyReleased) {
             if (event.key.code == sf::Keyboard::Key::Left) {
-                (*direction) += 1;
+                playerDirection += 1;
             }
             if (event.key.code == sf::Keyboard::Key::Right) {
-                (*direction) -= 1;
+                playerDirection -= 1;
             }
         }
     }
     else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Space) {
-        (*game).restart(getTime());
+        game.restart();
+	gameClock.restart();
     }
-}
-
-double getTime() {
-    double ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    return ms;
 }

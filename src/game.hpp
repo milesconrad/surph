@@ -26,13 +26,11 @@ class Game {
         int wavesNum = sizeof(waves) / sizeof(waves[0]);
 
         bool gameRunning = true;
-        double startTime;
 
-        void init(double currentTime) {
+        void init() {
             window.create(sf::VideoMode(900, 600), "Surph");
             window.setVerticalSyncEnabled(true);
             window.setKeyRepeatEnabled(false);
-            startTime = currentTime;
             score = 0;
 
             player.init();
@@ -129,10 +127,8 @@ class Game {
             scoreText.setPosition(450 - scoreBounds.width / 2, 300 - scoreBounds.height / 2);
         }
 
-        void restart(double currentTime) {
+        void restart() {
             gameRunning = true;
-            startTime = currentTime;
-            score = 0;
         
             for (int i = 0; i < wavesNum; i++) {
                 waves[i].init();
