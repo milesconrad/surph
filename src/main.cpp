@@ -8,12 +8,13 @@ Game game;
 sf::Clock gameClock;
 // -1 is left, 1 is right
 int playerDirection = 0;
+// if lastFrame is not reset when the clock is reset, deltaTime goes negative which messes with obstacle generation
+float lastFrame = gameClock.getElapsedTime().asSeconds();
 
 int main() {
     game.init();
     std::thread scoreKeeperThread(scoreKeeper);
 
-    float lastFrame = gameClock.getElapsedTime().asSeconds();
     float deltaTime;
     while (game.window.isOpen()) {
         sf::Event event;
@@ -25,6 +26,7 @@ int main() {
         lastFrame = gameClock.getElapsedTime().asSeconds();
 
         if (game.collisionDetect()) {
+            playerDirection = 0;
             game.end();
         }
 
@@ -69,7 +71,8 @@ void handleEvent(sf::Event event) {
         }
     }
     else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Space) {
+        lastFrame = 0;
         game.restart();
-	gameClock.restart();
+	    gameClock.restart();
     }
 }

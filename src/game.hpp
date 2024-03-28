@@ -17,7 +17,7 @@ class Game {
 
     public:
         sf::RenderWindow window;
-        int score;
+        int score = 0;
         Player player;
 
         Boulder boulders[4];
@@ -31,7 +31,6 @@ class Game {
             window.create(sf::VideoMode(900, 600), "Surph");
             window.setVerticalSyncEnabled(true);
             window.setKeyRepeatEnabled(false);
-            score = 0;
 
             player.init();
 
@@ -120,7 +119,6 @@ class Game {
             // i know this is bad practice but i didn't feel like making a second object just for an end screen
             scoreText.setString("Game Over! Total Score: " + std::to_string(score) + "\n\n   Press Space to Restart!");
 
-            scoreText.setCharacterSize(30);
             scoreText.setOutlineThickness(5);
             
             sf::FloatRect scoreBounds = scoreText.getLocalBounds();
@@ -140,7 +138,6 @@ class Game {
             }
             player.init();
 
-            scoreText.setCharacterSize(30);
             scoreText.setOutlineThickness(0);
         }
 };

@@ -18,13 +18,12 @@ class Player {
 
         void init() {
             // makes a fresh circle shape (for restarting game)
-            entity = sf::CircleShape();
+            entity = sf::CircleShape(height);
             if (!texture.loadFromFile("assets/surfer.png")) {
                 texture.loadFromFile("assets/surfer.png");
             }
             entity.setTexture(&texture);
 
-            entity.setRadius(height);
             // makes the circle a 31 x ~100 ellipse
             entity.scale(1, 3.2);
 
