@@ -1,8 +1,7 @@
-class Boulder {
-    private:
-        sf::Texture texture;
-        float velocity = 80;
+#include <random>
+#include <SFML/Graphics.hpp>
 
+class Boulder {
     public:
         sf::CircleShape entity;
         int height = 150;
@@ -21,4 +20,14 @@ class Boulder {
         void update(float dt, int score) {
             entity.move(0, (velocity + (score * 2)) * dt);
         }
+
+    private:
+        sf::Texture texture;
+        float velocity = 80;
+        
+        std::random_device randomDevice;
+        std::mt19937 rng{randomDevice()};
+        // generation range makes sure boulders/waves are not directly at the edge
+        std::uniform_int_distribution<int> positionGen{50, 850};
+        std::uniform_int_distribution<int> boulderSpriteGen{1, 3};
 };
