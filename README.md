@@ -8,4 +8,4 @@ The process is basic, be sure CMake is installed on your system and run
   
 and the executable + assets will be located in the `build/` directory
 
-![gameplay](https://raw.githubusercontent.com/mmiiles/surph/main/images/gameplay.png)
+![gameplay](https://raw.githubusercontent.com/mmiiles/surph/main/.gameplay.png)
