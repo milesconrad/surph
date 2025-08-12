@@ -8,7 +8,7 @@ class Game {
         bool collisionDetect();
         void restart();
 
-        int score{0};
+        int score;
         bool gameRunning;
 
         Player player;

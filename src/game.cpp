@@ -3,6 +3,7 @@
 
 void Game::init() {
     gameRunning = true;
+    score = 0;
 
     player.init();
 

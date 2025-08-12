@@ -1,4 +1,3 @@
-#include <thread>
 #include "game.hpp"
 
 sf::RenderWindow window;
@@ -8,14 +7,6 @@ Game game{};
 sf::Clock gameClock;
 int playerDirection = 0; // -1 is left, 1 is right
 float lastFrame = gameClock.getElapsedTime().asSeconds(); // if not reset when clock is reset, delta time goes negative
-
-void scoreKeeper() {
-    while (window.isOpen()) {
-        if (game.gameRunning) {
-            game.score = gameClock.getElapsedTime().asSeconds();
-        }
-    } 
-}
 
 void handleEvent(sf::Event event) {
     if (event.type == sf::Event::Closed) {
@@ -48,8 +39,6 @@ void handleEvent(sf::Event event) {
 }
 
 int main() {
-    std::thread scoreKeeperThread(scoreKeeper);
-
     float deltaTime;
     sf::Font arial;
 
@@ -114,6 +103,7 @@ int main() {
 
             // position needs to be redefined because text size changes as game progresses
             // use the height of the text box to determine padding
+            game.score = gameClock.getElapsedTime().asSeconds();
             scoreText.setString("Score: " + std::to_string(game.score));
             sf::FloatRect scoreBounds = scoreText.getLocalBounds();
             scoreText.setPosition(900 - scoreBounds.width - scoreBounds.height + scoreBounds.left, scoreBounds.height - scoreBounds.top);
@@ -133,6 +123,5 @@ int main() {
         window.display();
     }
 
-    scoreKeeperThread.join();
     return 0;
 }
