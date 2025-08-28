@@ -78,7 +78,7 @@ int main() {
             scoreText.setPosition(450 - scoreBounds.width / 2, 300 - scoreBounds.height / 2);
         }
 
-        window.clear(sf::Color(20, 37, 107, 255));
+        window.clear(sf::Color(0, 110, 200, 255));
 
         if (game.gameRunning) {
             for (int i = 0; i < game.wavesNum; i++) {
