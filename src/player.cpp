@@ -11,16 +11,16 @@ void Player::rotatePoints(float factor) {
 }
 
 void Player::updatePos(float dt) {
-    if (entity.getPosition().x > 80 && velocity < 0) {
-        entity.move(velocity * dt, 0);
-    } else if (entity.getPosition().x < 820 && velocity > 0) {
+    // direction is important because player gets stuck outside of bounds
+    if ((entity.getPosition().x > 80 && velocity < 0) ||
+	(entity.getPosition().x < 820 && velocity > 0)) {
         entity.move(velocity * dt, 0);
     } else {
         velocity = 0;
     }
 }
 
-void Player::updateData(int *direction, int score) {
+void Player::updateData(int direction, int score) {
     // defining the outline of the ellipse relative to the center
     // only drawing points near the front of the surfboard, because touching the rock from the back would not kill you
     edgePoints[0] = sf::Vector2f(-(bounds.width / 2), 0);
@@ -37,7 +37,7 @@ void Player::updateData(int *direction, int score) {
     globalPosition = entity.getPosition();
     // if the left or right key is pressed, accelerate and tilt in that direction
     // score makes everything move faster
-    if ((*direction) < 0) {
+    if ((direction) < 0) {
         entity.setRotation(-20);
 
         radians = -20 * 3.1415926 / 180;
@@ -46,7 +46,7 @@ void Player::updateData(int *direction, int score) {
         if (velocity > (-200 - (score * 2))) {
             velocity -= 5 + (score * 2);
         }
-    } else if ((*direction) > 0) {
+    } else if ((direction) > 0) {
         entity.setRotation(20);
 
         radians = 20 * 3.1415926 / 180;
@@ -57,9 +57,9 @@ void Player::updateData(int *direction, int score) {
         }
     } else {
         if (velocity < 0) {
-            velocity += 1.5;
+            velocity += 3;
         } else if (velocity > 0) {
-            velocity -= 1.5;
+            velocity -= 3;
         }
 
         // rotates points and player back to 0

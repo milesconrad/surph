@@ -15,7 +15,7 @@ class Player {
 
         void rotatePoints(float factor);
 
-        void updateData(int *direction, int score);
+        void updateData(int direction, int score);
 
         void updatePos(float dt);
 

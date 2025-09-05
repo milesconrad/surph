@@ -97,7 +97,7 @@ int main() {
                 window.draw(game.boulders[i].entity);
             }
 
-            game.player.updateData(&playerDirection, game.score);
+            game.player.updateData(playerDirection, game.score);
             game.player.updatePos(deltaTime);
             window.draw(game.player.entity);
 
